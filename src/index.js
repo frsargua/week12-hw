@@ -42,6 +42,18 @@ const addToDeparmentDB = (department) => {
   );
 };
 
+//Add new role to role table in DB
+const addtoRoleDB = (title, salary, deparment) => {
+  db.query(
+    `INSERT INTO role (title, salary, deparment_id)
+  VALUES ("${title}","${salary}","${deparment}");
+`,
+    function (err, results) {
+      console.log(results);
+    }
+  );
+};
+
 const enquirerFunction = async () => {
   await inquirer.prompt(options).then((answer) => console.log(answer));
 };
