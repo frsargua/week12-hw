@@ -53,6 +53,34 @@ const addtoRoleDB = (title, salary, deparment) => {
     }
   );
 };
+// addtoRoleDB("teacher", 20139, 1);
+
+//Add new employee to employee table in DB
+const addtoEmployeeDB = (firstName, lastName, role, manager) => {
+  db.query(
+    `INSERT INTO employee (first_name, last_name, role_id,manager_id)
+  VALUES ("${firstName}","${lastName}","${role}",${manager});
+`,
+    function (err, results) {
+      console.log(results);
+    }
+  );
+};
+
+//Update employee in the employee table from the DB
+const updateEmployeeDB = (newRole, employeeID) => {
+  db.query(
+    `UPDATE employee
+    SET role_id = ${newRole}
+    WHERE id = ${employeeID};
+`,
+    function (err, results) {
+      console.log(results);
+    }
+  );
+};
+
+// updateEmployeeDB(2, 1);
 
 const enquirerFunction = async () => {
   await inquirer.prompt(options).then((answer) => console.log(answer));
