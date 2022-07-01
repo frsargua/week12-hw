@@ -2,10 +2,10 @@ import express from "express";
 import * as mysql from "mysql2";
 import inquirer from "inquirer";
 // Importing questions
-import * as questions from "./questions/options.js";
+import { options } from "./questions/options.js";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -23,8 +23,10 @@ const db = mysql.createConnection(
 );
 
 const enquirerFunction = async () => {
-  await inquirer.prompt(questions).then((answer) => console.log(answer));
+  await inquirer.prompt(options).then((answer) => console.log(answer));
 };
+
+enquirerFunction();
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
