@@ -29,7 +29,7 @@ const db = mysql.createConnection(
 //Load table from DB
 const loadtableFromDb = (table) => {
   db.query(`SELECT * FROM ${table}`, function (err, results) {
-    console.log(results);
+    console.table(results);
   });
 };
 
@@ -95,14 +95,72 @@ const printer = async () => {
   console.log(await getFromTableInDB("name", "deparment"));
 };
 
-printer();
+//Creates question for inner inquirer
+const createQuestion = async (option) => {
+  const arrayOfChoices = await getFromTableInDB("name", "deparment");
 
+  const arrayObjects = [
+    {
+      name: "name",
+      message: `"Please select the ${option}:`,
+      type: "list",
+      choices: arrayOfChoices,
+    },
+  ];
+  console.log(arrayObjects);
+  return arrayObjects;
+};
 // Enquirer function to start the app
 const enquirerFunction = async () => {
-  await inquirer.prompt(options).then((answer) => console.log(answer));
+  let verifier = true;
+  while (verifier) {
+    await inquirer.prompt(options).then(async (answer) => {
+      switch (answer.mainOptions.toLowerCase()) {
+        case "view all departments":
+          console.log("hi");
+          loadtableFromDb("deparment");
+          console.log("hi");
+          break;
+        case "view all roles":
+          console.log("hi");
+          loadtableFromDb("role");
+          console.log("hi");
+          break;
+        case "view all employees":
+          console.log("hi");
+          loadtableFromDb("employee");
+          console.log("hi");
+          break;
+        case "add a department":
+          console.log("hi");
+          loadtableFromDb("employee");
+          console.log("hi");
+          break;
+          console.log("hi");
+        case "add a role":
+          loadtableFromDb("employee");
+          console.log("hi");
+          break;
+        case "add an employee":
+          console.log("hi");
+          loadtableFromDb("employee");
+          console.log("hi");
+          break;
+        case "add an employee role":
+          console.log("hi");
+          loadtableFromDb("employee:");
+          console.log("hi");
+          break;
+        case "quit":
+          verifier = false;
+          break;
+      }
+    });
+  }
+  return;
 };
 
-// enquirerFunction();
+enquirerFunction();
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
