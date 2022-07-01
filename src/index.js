@@ -22,11 +22,30 @@ const db = mysql.createConnection(
   console.log(`Connected to the movies_db database.`)
 );
 
+//Quey statements
+//Load table from DB
+const loadtableFromDb = (table) => {
+  db.query(`SELECT * FROM ${table}`, function (err, results) {
+    console.log(results);
+  });
+};
+
+const addToDeparmentDB = (department) => {
+  db.query(
+    `INSERT INTO deparment (name)
+  VALUES ("${department}");
+`,
+    function (err, results) {
+      console.log(results);
+    }
+  );
+};
+
 const enquirerFunction = async () => {
   await inquirer.prompt(options).then((answer) => console.log(answer));
 };
 
-enquirerFunction();
+// enquirerFunction();
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
