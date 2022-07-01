@@ -1,0 +1,50 @@
+#STRUCTURE FOR SCRIPT
+
+-OPTIONS
+    - View all departments
+        - names
+        - Departments ids
+    - view all roles
+        - id
+        - title
+        - department
+        - salary
+    - View all employees
+        - id
+        - firstName
+        - lastNames
+        - role
+        - departments
+        - salaries
+        - managers full name
+    - Add a department
+        - name of new department?
+    - Add a role
+        - name?
+        - salary ?
+        - department for the role ?
+            Get all departments from db and construct department choices:
+            - Department 1
+            - Department 2
+            - Department 3
+    - Add an employee
+        - First name?
+        - last name?
+        Get all roles from db and construct roles choices:
+        - role?
+            - Role 1
+            - Role 2
+            - Role 3
+        Get all employees from db and construct employees choices:
+        - manager?
+
+    - Update employee role
+        Get all employees from db and construct employees choices:
+        - Select employee?
+            - Employee 1
+            - Employee 2
+            - Employee 3
+        - Select role you want to update for the employee:
+            - Role 1
+            - Role 2
+            - Role 3
