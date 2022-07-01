@@ -1,9 +1,9 @@
-const options = [
+export const options = [
   {
     name: "mainOptions",
     message: "OPTIONS:",
     type: "list",
-    choice: [
+    choices: [
       "View all departments",
       "View all roles",
       "View all employees",
