@@ -40,7 +40,7 @@ const addToDeparmentDB = (department) => {
   VALUES ("${department}");
 `,
     function (err, results) {
-      console.log(results);
+      console.log("Successfully added!");
     }
   );
 };
@@ -127,14 +127,20 @@ const enquirerFunction = async () => {
           console.log("hi");
           break;
         case "view all employees":
-          console.log("hi");
           loadtableFromDb("employee");
-          console.log("hi");
           break;
         case "add a department":
-          console.log("hi");
-          loadtableFromDb("employee");
-          console.log("hi");
+          await inquirer
+            .prompt([
+              {
+                name: "deparmentName",
+                message: "What is the name of the new department?",
+                type: "input",
+              },
+            ])
+            .then(async (answer) => {
+              addToDeparmentDB(answer.deparmentName);
+            });
           break;
           console.log("hi");
         case "add a role":
