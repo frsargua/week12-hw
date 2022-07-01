@@ -1,5 +1,5 @@
 import express from "express";
-// const inquirer = require("inquirer");
+import * as mysql from "mysql2";
 import inquirer from "inquirer";
 // Importing questions
 import * as questions from "./questions/options.js";
