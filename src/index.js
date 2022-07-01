@@ -1,6 +1,8 @@
-const exp = require("constants");
-const express = require("express");
-const inquirer = require("inquirer");
+import express from "express";
+// const inquirer = require("inquirer");
+import inquirer from "inquirer";
+// Importing questions
+import * as questions from "./questions/options.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +21,10 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the movies_db database.`)
 );
+
+const enquirerFunction = async () => {
+  await inquirer.prompt(questions).then((answer) => console.log(answer));
+};
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
