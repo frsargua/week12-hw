@@ -30,6 +30,7 @@ const loadtableFromDb = (table) => {
   });
 };
 
+//Add new department to DB
 const addToDeparmentDB = (department) => {
   db.query(
     `INSERT INTO deparment (name)
