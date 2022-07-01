@@ -3,6 +3,9 @@ import * as mysql from "mysql2";
 import inquirer from "inquirer";
 // Importing questions
 import { options } from "./questions/options.js";
+import { async } from "rxjs";
+
+let arrayFromKey;
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -53,7 +56,6 @@ const addtoRoleDB = (title, salary, deparment) => {
     }
   );
 };
-// addtoRoleDB("teacher", 20139, 1);
 
 //Add new employee to employee table in DB
 const addtoEmployeeDB = (firstName, lastName, role, manager) => {
@@ -80,8 +82,22 @@ const updateEmployeeDB = (newRole, employeeID) => {
   );
 };
 
-// updateEmployeeDB(2, 1);
+//Provide table
+const getFromTableInDB = async (key, table) => {
+  var sqlLit = `SELECT ${key} FROM week12.${table};
+  `;
+  const results = await db.promise().query(sqlLit);
+  let arrayOfResults = results[0].map((index) => index[key]);
+  return arrayOfResults;
+};
 
+const printer = async () => {
+  console.log(await getFromTableInDB("name", "deparment"));
+};
+
+printer();
+
+// Enquirer function to start the app
 const enquirerFunction = async () => {
   await inquirer.prompt(options).then((answer) => console.log(answer));
 };
