@@ -2,7 +2,7 @@ import express from "express";
 import * as mysql from "mysql2";
 import inquirer from "inquirer";
 // Importing questions
-import { options } from "./questions/options.js";
+import { options, newEmployeeQuestionaire } from "./questions/options.js";
 import { async } from "rxjs";
 
 let arrayFromKey;
@@ -21,8 +21,8 @@ const db = mysql.createConnection(
     user: "root",
     password: "47B66FQvaM!",
     database: "week12",
-  },
-  console.log(`Connected to the movies_db database.`)
+  }
+  // console.log(`Connected to the movies_db database.`)
 );
 
 //Quey statements
@@ -96,13 +96,13 @@ const printer = async () => {
 };
 
 //Creates question for inner inquirer
-const createQuestion = async (option) => {
-  const arrayOfChoices = await getFromTableInDB("name", "deparment");
+const createQuestion = async (key, table) => {
+  const arrayOfChoices = await getFromTableInDB(key, table);
 
   const arrayObjects = [
     {
       name: "name",
-      message: `"Please select the ${option}:`,
+      message: `"Please select the ${table}:`,
       type: "list",
       choices: arrayOfChoices,
     },
@@ -144,13 +144,20 @@ const enquirerFunction = async () => {
           break;
           console.log("hi");
         case "add a role":
-          loadtableFromDb("employee");
-          console.log("hi");
           break;
         case "add an employee":
-          console.log("hi");
-          loadtableFromDb("employee");
-          console.log("hi");
+          await inquirer
+            .prompt(newEmployeeQuestionaire)
+            .then(async (answer) => {
+              const newEmployee = Object.values(answer);
+              console.log(newEmployee);
+              addtoEmployeeDB(
+                newEmployee[0],
+                newEmployee[1],
+                newEmployee[2],
+                newEmployee[3]
+              );
+            });
           break;
         case "add an employee role":
           console.log("hi");
@@ -167,6 +174,8 @@ const enquirerFunction = async () => {
 };
 
 enquirerFunction();
+
+// createQuestion("name", "deparment");
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
