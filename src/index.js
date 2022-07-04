@@ -6,6 +6,7 @@ import {
   options,
   newRoleQuestionaire,
   newEmployeeQuestionaire,
+  updateEmployeeQuestionaire,
 } from "./questions/options.js";
 import { async } from "rxjs";
 
@@ -169,11 +170,14 @@ const enquirerFunction = async () => {
               );
             });
           break;
-        case "add an employee role":
-          console.log("hi");
-          loadtableFromDb("employee:");
-          console.log("hi");
-          break;
+        case "update employee role:":
+          await inquirer
+            .prompt(updateEmployeeQuestionaire)
+            .then(async (answer) => {
+              const updatedEmployee = Object.values(answer);
+              console.log(updatedEmployee);
+              updateEmployeeDB(updatedEmployee[0], updatedEmployee[1]);
+            });
         case "quit":
           verifier = false;
           break;
