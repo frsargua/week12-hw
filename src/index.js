@@ -30,7 +30,7 @@ const db = mysql.createConnection(
   // console.log(`Connected to the movies_db database.`)
 );
 
-//Quey statements
+//Query statements
 //Load table from DB
 const loadtableFromDb = (table) => {
   db.query(`SELECT * FROM ${table}`, function (err, results) {
@@ -94,10 +94,6 @@ const getFromTableInDB = async (key, table) => {
   const results = await db.promise().query(sqlLit);
   let arrayOfResults = results[0].map((index) => index[key]);
   return arrayOfResults;
-};
-
-const printer = async () => {
-  console.log(await getFromTableInDB("name", "deparment"));
 };
 
 //Creates question for inner inquirer
@@ -188,8 +184,6 @@ const enquirerFunction = async () => {
 };
 
 enquirerFunction();
-
-// createQuestion("name", "deparment");
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
