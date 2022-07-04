@@ -2,7 +2,11 @@ import express from "express";
 import * as mysql from "mysql2";
 import inquirer from "inquirer";
 // Importing questions
-import { options, newEmployeeQuestionaire } from "./questions/options.js";
+import {
+  options,
+  newRoleQuestionaire,
+  newEmployeeQuestionaire,
+} from "./questions/options.js";
 import { async } from "rxjs";
 
 let arrayFromKey;
@@ -144,6 +148,12 @@ const enquirerFunction = async () => {
           break;
           console.log("hi");
         case "add a role":
+          await inquirer.prompt(newRoleQuestionaire).then(async (answer) => {
+            const newRole = Object.values(answer);
+            console.log(newRole);
+            addtoRoleDB(newRole[0], newRole[1], newRole[2]);
+          });
+
           break;
         case "add an employee":
           await inquirer
