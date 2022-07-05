@@ -89,11 +89,22 @@ const addtoEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
 };
 
 //Update employee in the employee table from the DB
-const updateEmployeeDB = (newRole, employeeID) => {
+const updateEmployeeDB = async (employeeName, newRole) => {
+  let currentEmployeeID = await convertValue(
+    "id",
+    "employee",
+    "first_name",
+    employeeName
+  );
+  console.log(currentEmployeeID);
+
+  let role_id = await convertValue("id", "role", "title", newRole);
+  console.log(role_id);
+
   db.query(
     `UPDATE employee
-    SET role_id = ${newRole}
-    WHERE id = ${employeeID};
+    SET role_id = ${role_id}
+    WHERE id = ${currentEmployeeID};
 `,
     function (err, results) {
       console.log(results);
