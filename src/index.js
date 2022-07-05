@@ -14,7 +14,7 @@ import { async } from "rxjs";
 let arrayFromKey;
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -70,10 +70,17 @@ const addtoRoleDB = async (title, salary, department_name) => {
 };
 
 //Add new employee to employee table in DB
-const addtoEmployeeDB = (firstName, lastName, role, manager) => {
+const addtoEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
+  let manager_id = await convertValue(
+    "id",
+    "employee",
+    "first_name",
+    manager_FN
+  );
+  let role_id = await convertValue("id", "role", "title", role_name);
   db.query(
     `INSERT INTO employee (first_name, last_name, role_id,manager_id)
-  VALUES ("${firstName}","${lastName}","${role}",${manager});
+  VALUES ("${firstName}","${lastName}","${role_id}",${manager_id});
 `,
     function (err, results) {
       console.log(results);
