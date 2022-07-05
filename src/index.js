@@ -7,6 +7,7 @@ import {
   newRoleQuestionaire,
   newEmployeeQuestionaire,
   updateEmployeeQuestionaire,
+  convertValue,
 } from "./questions/options.js";
 import { async } from "rxjs";
 
@@ -51,15 +52,21 @@ const addToDeparmentDB = (department) => {
 };
 
 //Add new role to role table in DB
-const addtoRoleDB = (title, salary, deparment) => {
-  db.query(
-    `INSERT INTO role (title, salary, deparment_id)
-  VALUES ("${title}","${salary}","${deparment}");
-`,
-    function (err, results) {
-      console.log(results);
-    }
+const addtoRoleDB = async (title, salary, department_name) => {
+  let department_id = await convertValue(
+    "id",
+    "deparment",
+    "name",
+    department_name
   );
+  // console.log("YOur current value is: " + typeof department_id);
+  let sqlLit = `INSERT INTO role (title, salary, deparment_id)
+  VALUES ("${title}","${salary}",${department_id});
+`;
+  console.log(sqlLit);
+  db.query(sqlLit, function (err, results) {
+    console.log(results);
+  });
 };
 
 //Add new employee to employee table in DB
@@ -143,11 +150,9 @@ const enquirerFunction = async () => {
               addToDeparmentDB(answer.deparmentName);
             });
           break;
-          console.log("hi");
         case "add a role":
           await inquirer.prompt(newRoleQuestionaire).then(async (answer) => {
             const newRole = Object.values(answer);
-            console.log(newRole);
             addtoRoleDB(newRole[0], newRole[1], newRole[2]);
           });
 
