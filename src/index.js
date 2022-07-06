@@ -1,18 +1,16 @@
 import express from "express";
 import * as mysql from "mysql2";
 import inquirer from "inquirer";
+
 // Importing questions
 import {
   options,
-  newRoleQuestionaire,
-  newEmployeeQuestionaire,
-  updateEmployeeQuestionaire,
+  createAddDepartmentQuestionnaire,
+  createNewRoleQuestionnaire,
+  createNewEmployeeQuestionnaire,
+  createUpdateEmployeeQuestionnaire,
   convertValue,
 } from "./questions/options.js";
-import { connectToDb } from "./questions/options.js";
-import { createUpdateEmployeeQuestionaire } from "./questions/options.js";
-
-let arrayFromKey;
 
 const app = express();
 const PORT = process.env.PORT || 3007;
@@ -20,45 +18,24 @@ const PORT = process.env.PORT || 3007;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to database
-// const db = mysql.createConnection(
-//   {
-//     host: "localhost",
-//     // MySQL username,
-//     user: "root",
-//     password: "47B66FQvaM!",
-//     database: "week12",
-//   }
-//   // console.log(`Connected to the movies_db database.`)
-// );
-
-// const connectToDb = async () => {
-//   return await mysql.createConnection(
-//     {
-//       host: "localhost",
-//       // MySQL username,
-//       user: "root",
-//       password: "47B66FQvaM!",
-//       database: "week12",
-//     }
-//     // console.log(`Connected to the movies_db database.`)
-//   );
-// };
+const db = mysql.createConnection({
+  host: "localhost",
+  // MySQL username,
+  user: "root",
+  password: "47B66FQvaM!",
+  database: "week12",
+});
 
 //Query statements
 //Load table from DB
-const loadtableFromDb = async (table) => {
-  let db = await connectToDb();
-
+const loadTableFromDb = async (table) => {
   db.query(`SELECT * FROM ${table}`, function (err, results) {
     console.table(results);
   });
 };
 
 //Add new department to DB
-const addToDeparmentDB = async (department) => {
-  let db = await connectToDb();
-
+const addToDepartmentDB = async (department) => {
   db.query(
     `INSERT INTO deparment (name)
   VALUES ("${department}");
@@ -70,19 +47,16 @@ const addToDeparmentDB = async (department) => {
 };
 
 //Add new role to role table in DB
-const addtoRoleDB = async (title, salary, department_name) => {
+const addToRoleDB = async (title, salary, department_name) => {
   let department_id = await convertValue(
     "id",
     "deparment",
     "name",
     department_name
   );
-  // console.log("YOur current value is: " + typeof department_id);
   let sqlLit = `INSERT INTO role (title, salary, deparment_id)
   VALUES ("${title}","${salary}",${department_id});
 `;
-  console.log(sqlLit);
-  let db = await connectToDb();
 
   db.query(sqlLit, function (err, results) {
     console.log(results);
@@ -90,7 +64,7 @@ const addtoRoleDB = async (title, salary, department_name) => {
 };
 
 //Add new employee to employee table in DB
-const addtoEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
+const addToEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
   let manager_id;
   if (manager_FN !== "null") {
     manager_id = await convertValue("id", "employee", "first_name", manager_FN);
@@ -98,7 +72,6 @@ const addtoEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
     manager_id = manager_FN;
   }
   let role_id = await convertValue("id", "role", "title", role_name);
-  let db = await connectToDb();
 
   db.query(
     `INSERT INTO employee (first_name, last_name, role_id,manager_id)
@@ -121,8 +94,6 @@ const updateEmployeeDB = async (employeeName, newRole) => {
 
   let role_id = await convertValue("id", "role", "title", newRole);
 
-  let db = await connectToDb();
-
   db.query(
     `UPDATE employee
     SET role_id = ${role_id}
@@ -134,32 +105,6 @@ const updateEmployeeDB = async (employeeName, newRole) => {
   );
 };
 
-//Provide table
-const getFromTableInDB = async (key, table) => {
-  var sqlLit = `SELECT ${key} FROM week12.${table};
-  `;
-  let db = await connectToDb();
-
-  const results = await db.promise().query(sqlLit);
-  let arrayOfResults = results[0].map((index) => index[key]);
-  return arrayOfResults;
-};
-
-//Creates question for inner inquirer
-const createQuestion = async (key, table) => {
-  const arrayOfChoices = await getFromTableInDB(key, table);
-
-  const arrayObjects = [
-    {
-      name: "name",
-      message: `"Please select the ${table}:`,
-      type: "list",
-      choices: arrayOfChoices,
-    },
-  ];
-  console.log(arrayObjects);
-  return arrayObjects;
-};
 // Enquirer function to start the app
 const enquirerFunction = async () => {
   let verifier = true;
@@ -167,45 +112,40 @@ const enquirerFunction = async () => {
     await inquirer.prompt(options).then(async (answer) => {
       switch (answer.mainOptions.toLowerCase()) {
         case "view all departments":
-          console.log("hi");
-          loadtableFromDb("deparment");
-          console.log("hi");
+          loadTableFromDb("deparment");
           break;
         case "view all roles":
-          console.log("hi");
-          loadtableFromDb("role");
-          console.log("hi");
+          loadTableFromDb("role");
           break;
         case "view all employees":
-          loadtableFromDb("employee");
+          loadTableFromDb("employee");
           break;
         case "add a department":
+          const addDepartmentQuestionnaire =
+            await createAddDepartmentQuestionnaire();
           await inquirer
-            .prompt([
-              {
-                name: "deparmentName",
-                message: "What is the name of the new department?",
-                type: "input",
-              },
-            ])
+            .prompt(addDepartmentQuestionnaire)
             .then(async (answer) => {
-              addToDeparmentDB(answer.deparmentName);
+              addToDepartmentDB(answer.departmentName);
             });
           break;
         case "add a role":
-          await inquirer.prompt(newRoleQuestionaire).then(async (answer) => {
+          const newRoleQuestionnaire = await createNewRoleQuestionnaire();
+          await inquirer.prompt(newRoleQuestionnaire).then(async (answer) => {
             const newRole = Object.values(answer);
-            addtoRoleDB(newRole[0], newRole[1], newRole[2]);
+            addToRoleDB(newRole[0], newRole[1], newRole[2]);
           });
 
           break;
         case "add an employee":
+          const newEmployeeQuestionnaire =
+            await createNewEmployeeQuestionnaire();
           await inquirer
-            .prompt(newEmployeeQuestionaire)
+            .prompt(newEmployeeQuestionnaire)
             .then(async (answer) => {
               const newEmployee = Object.values(answer);
               console.log(newEmployee);
-              addtoEmployeeDB(
+              addToEmployeeDB(
                 newEmployee[0],
                 newEmployee[1],
                 newEmployee[2],
@@ -214,11 +154,14 @@ const enquirerFunction = async () => {
             });
           break;
         case "update employee role:":
-          const questArr = await createUpdateEmployeeQuestionaire();
-          await inquirer.prompt(questArr).then(async (answer) => {
-            const updatedEmployee = Object.values(answer);
-            updateEmployeeDB(updatedEmployee[0], updatedEmployee[1]);
-          });
+          const UpdateEmployeeQuestionnaire =
+            await createUpdateEmployeeQuestionnaire();
+          await inquirer
+            .prompt(UpdateEmployeeQuestionnaire)
+            .then(async (answer) => {
+              const updatedEmployee = Object.values(answer);
+              updateEmployeeDB(updatedEmployee[0], updatedEmployee[1]);
+            });
           break;
         case "quit":
           verifier = false;
@@ -226,9 +169,13 @@ const enquirerFunction = async () => {
       }
     });
   }
-  return;
+  server.close((err) => {
+    console.log("Questionnaire closed");
+    process.exit(err ? 1 : 0);
+  });
 };
 
+// Run functions upon start
 enquirerFunction();
 
 // Default response for any other request (Not Found)
@@ -236,6 +183,6 @@ app.use((req, res) => {
   res.status(404).end();
 });
 
-app.listen(PORT, () => {
+var server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
