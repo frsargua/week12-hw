@@ -9,38 +9,56 @@ import {
   updateEmployeeQuestionaire,
   convertValue,
 } from "./questions/options.js";
-import { async } from "rxjs";
+import { connectToDb } from "./questions/options.js";
+import { createUpdateEmployeeQuestionaire } from "./questions/options.js";
 
 let arrayFromKey;
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3007;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Connect to database
-const db = mysql.createConnection(
-  {
-    host: "localhost",
-    // MySQL username,
-    user: "root",
-    password: "47B66FQvaM!",
-    database: "week12",
-  }
-  // console.log(`Connected to the movies_db database.`)
-);
+// const db = mysql.createConnection(
+//   {
+//     host: "localhost",
+//     // MySQL username,
+//     user: "root",
+//     password: "47B66FQvaM!",
+//     database: "week12",
+//   }
+//   // console.log(`Connected to the movies_db database.`)
+// );
+
+// const connectToDb = async () => {
+//   return await mysql.createConnection(
+//     {
+//       host: "localhost",
+//       // MySQL username,
+//       user: "root",
+//       password: "47B66FQvaM!",
+//       database: "week12",
+//     }
+//     // console.log(`Connected to the movies_db database.`)
+//   );
+// };
 
 //Query statements
 //Load table from DB
-const loadtableFromDb = (table) => {
+const loadtableFromDb = async (table) => {
+  let db = await connectToDb();
+
   db.query(`SELECT * FROM ${table}`, function (err, results) {
     console.table(results);
   });
 };
 
 //Add new department to DB
-const addToDeparmentDB = (department) => {
+const addToDeparmentDB = async (department) => {
+  let db = await connectToDb();
+
   db.query(
     `INSERT INTO deparment (name)
   VALUES ("${department}");
@@ -64,6 +82,8 @@ const addtoRoleDB = async (title, salary, department_name) => {
   VALUES ("${title}","${salary}",${department_id});
 `;
   console.log(sqlLit);
+  let db = await connectToDb();
+
   db.query(sqlLit, function (err, results) {
     console.log(results);
   });
@@ -71,13 +91,15 @@ const addtoRoleDB = async (title, salary, department_name) => {
 
 //Add new employee to employee table in DB
 const addtoEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
-  let manager_id = await convertValue(
-    "id",
-    "employee",
-    "first_name",
-    manager_FN
-  );
+  let manager_id;
+  if (manager_FN !== "null") {
+    manager_id = await convertValue("id", "employee", "first_name", manager_FN);
+  } else {
+    manager_id = manager_FN;
+  }
   let role_id = await convertValue("id", "role", "title", role_name);
+  let db = await connectToDb();
+
   db.query(
     `INSERT INTO employee (first_name, last_name, role_id,manager_id)
   VALUES ("${firstName}","${lastName}","${role_id}",${manager_id});
@@ -96,10 +118,10 @@ const updateEmployeeDB = async (employeeName, newRole) => {
     "first_name",
     employeeName
   );
-  console.log(currentEmployeeID);
 
   let role_id = await convertValue("id", "role", "title", newRole);
-  console.log(role_id);
+
+  let db = await connectToDb();
 
   db.query(
     `UPDATE employee
@@ -116,6 +138,8 @@ const updateEmployeeDB = async (employeeName, newRole) => {
 const getFromTableInDB = async (key, table) => {
   var sqlLit = `SELECT ${key} FROM week12.${table};
   `;
+  let db = await connectToDb();
+
   const results = await db.promise().query(sqlLit);
   let arrayOfResults = results[0].map((index) => index[key]);
   return arrayOfResults;
@@ -190,13 +214,12 @@ const enquirerFunction = async () => {
             });
           break;
         case "update employee role:":
-          await inquirer
-            .prompt(updateEmployeeQuestionaire)
-            .then(async (answer) => {
-              const updatedEmployee = Object.values(answer);
-              console.log(updatedEmployee);
-              updateEmployeeDB(updatedEmployee[0], updatedEmployee[1]);
-            });
+          const questArr = await createUpdateEmployeeQuestionaire();
+          await inquirer.prompt(questArr).then(async (answer) => {
+            const updatedEmployee = Object.values(answer);
+            updateEmployeeDB(updatedEmployee[0], updatedEmployee[1]);
+          });
+          break;
         case "quit":
           verifier = false;
           break;
