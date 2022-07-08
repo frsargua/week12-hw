@@ -1,5 +1,4 @@
 import express from "express";
-import * as mysql from "mysql2";
 import inquirer from "inquirer";
 
 // Importing questions
@@ -12,98 +11,20 @@ import {
   convertValue,
 } from "./questions/options.js";
 
+//Importing functions for enquirer
+import {
+  printTableFromDB,
+  addToDepartmentDB,
+  addToRoleDB,
+  addToEmployeeDB,
+  updateEmployeeDB,
+} from "./utils/helpers.js";
+
 const app = express();
-const PORT = process.env.PORT || 3007;
+const PORT = process.env.PORT || 3008;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
-const db = mysql.createConnection({
-  host: "localhost",
-  // MySQL username,
-  user: "root",
-  password: "47B66FQvaM!",
-  database: "week12",
-});
-
-//Query statements
-//Load table from DB
-const loadTableFromDb = async (table) => {
-  db.query(`SELECT * FROM ${table}`, function (err, results) {
-    console.table(results);
-  });
-};
-
-//Add new department to DB
-const addToDepartmentDB = async (department) => {
-  db.query(
-    `INSERT INTO deparment (name)
-  VALUES ("${department}");
-`,
-    function (err, results) {
-      console.log("Successfully added!");
-    }
-  );
-};
-
-//Add new role to role table in DB
-const addToRoleDB = async (title, salary, department_name) => {
-  let department_id = await convertValue(
-    "id",
-    "deparment",
-    "name",
-    department_name
-  );
-  let sqlLit = `INSERT INTO role (title, salary, deparment_id)
-  VALUES ("${title}","${salary}",${department_id});
-`;
-
-  db.query(sqlLit, function (err, results) {
-    console.log(results);
-  });
-};
-
-//Add new employee to employee table in DB
-const addToEmployeeDB = async (firstName, lastName, role_name, manager_FN) => {
-  let manager_id;
-  if (manager_FN !== "null") {
-    manager_id = await convertValue("id", "employee", "first_name", manager_FN);
-  } else {
-    manager_id = manager_FN;
-  }
-  let role_id = await convertValue("id", "role", "title", role_name);
-
-  db.query(
-    `INSERT INTO employee (first_name, last_name, role_id,manager_id)
-  VALUES ("${firstName}","${lastName}","${role_id}",${manager_id});
-`,
-    function (err, results) {
-      console.log(results);
-    }
-  );
-};
-
-//Update employee in the employee table from the DB
-const updateEmployeeDB = async (employeeName, newRole) => {
-  let currentEmployeeID = await convertValue(
-    "id",
-    "employee",
-    "first_name",
-    employeeName
-  );
-
-  let role_id = await convertValue("id", "role", "title", newRole);
-
-  db.query(
-    `UPDATE employee
-    SET role_id = ${role_id}
-    WHERE id = ${currentEmployeeID};
-`,
-    function (err, results) {
-      console.log(results);
-    }
-  );
-};
 
 // Enquirer function to start the app
 const enquirerFunction = async () => {
@@ -112,13 +33,13 @@ const enquirerFunction = async () => {
     await inquirer.prompt(options).then(async (answer) => {
       switch (answer.mainOptions.toLowerCase()) {
         case "view all departments":
-          loadTableFromDb("deparment");
+          await printTableFromDB("deparment");
           break;
         case "view all roles":
-          loadTableFromDb("role");
+          await printTableFromDB("role");
           break;
         case "view all employees":
-          loadTableFromDb("employee");
+          await printTableFromDB("employee");
           break;
         case "add a department":
           const addDepartmentQuestionnaire =
