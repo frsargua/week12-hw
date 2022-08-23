@@ -12,13 +12,13 @@ import {
 } from "./questions/options.js";
 
 //Importing functions for enquirer
+import { printTableFromDB } from "./utils/helpers.js";
+import { updateEmployeeDB } from "./utils/update.js";
 import {
-  printTableFromDB,
   addToDepartmentDB,
   addToRoleDB,
   addToEmployeeDB,
-  updateEmployeeDB,
-} from "./utils/helpers.js";
+} from "./utils/add.js";
 
 const app = express();
 const PORT = process.env.PORT || 3008;

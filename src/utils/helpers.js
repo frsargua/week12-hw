@@ -1,9 +1,6 @@
 import { db } from "../config/index.js";
 import * as cTable from "console.table";
-import { convertValue } from "../questions/options.js";
 
-//Query statements
-//Load table from DB
 export const printTableFromDB = async (table) => {
   let sqlLit = `SELECT * FROM deparment`;
   if (table == "role") {
@@ -17,78 +14,25 @@ export const printTableFromDB = async (table) => {
   console.log(cTable.getTable(rows));
 };
 
-//Add new department to DB
-export const addToDepartmentDB = async (department) => {
-  db.query(
-    `INSERT INTO deparment (name)
-    VALUES ("${department}");
-  `,
-    function (err, results) {
-      console.log("Successfully added!");
-    }
-  );
-};
-
-//Add new role to role table in DB
-export const addToRoleDB = async (title, salary, department_name) => {
-  let department_id = await convertValue(
-    "id",
-    "deparment",
-    "name",
-    department_name
-  );
-  let sqlLit = `INSERT INTO role (title, salary, deparment_id)
-    VALUES ("${title}","${salary}",${department_id});
+export const convertValue = async (toVar, table, fromVar, value) => {
+  let sqlLitCV = `SELECT ${toVar} FROM week12.${table} WHERE ${fromVar} = '${value}';
   `;
-
-  db.query(sqlLit, function (err, results) {
-    console.log(results);
-  });
+  const newValue = await db.promise().query(sqlLitCV);
+  let arrayOfResults = newValue[0].map((index) => index[toVar]);
+  // Returns the first value from the conversion
+  return arrayOfResults[0];
 };
 
-//Add new employee to employee table in DB
-export const addToEmployeeDB = async (
-  firstName,
-  lastName,
-  role_name,
-  manager_FN
-) => {
-  let manager_id;
-  if (manager_FN !== "null") {
-    manager_id = await convertValue("id", "employee", "first_name", manager_FN);
-  } else {
-    manager_id = manager_FN;
-  }
-  let role_id = await convertValue("id", "role", "title", role_name);
+export async function arrayOfManagers() {
+  const managersFromDB = await getFromTableInDB("first_name", "employee");
+  managersFromDB.push("null");
+  return managersFromDB;
+}
 
-  db.query(
-    `INSERT INTO employee (first_name, last_name, role_id,manager_id)
-    VALUES ("${firstName}","${lastName}","${role_id}",${manager_id});
-  `,
-    function (err, results) {
-      console.log(results);
-    }
-  );
-};
-
-//Update employee in the employee table from the DB
-export const updateEmployeeDB = async (employeeName, newRole) => {
-  let currentEmployeeID = await convertValue(
-    "id",
-    "employee",
-    "first_name",
-    employeeName
-  );
-
-  let role_id = await convertValue("id", "role", "title", newRole);
-
-  db.query(
-    `UPDATE employee
-      SET role_id = ${role_id}
-      WHERE id = ${currentEmployeeID};
-  `,
-    function (err, results) {
-      console.log(results);
-    }
-  );
+export const getFromTableInDB = async (key, table) => {
+  var sqlLit = `SELECT ${key} FROM week12.${table};
+  `;
+  const dataFromDB = await db.promise().query(sqlLit);
+  let arrayOfResults = dataFromDB[0].map((index) => index[key]);
+  return arrayOfResults;
 };
