@@ -19,7 +19,7 @@ import {
 } from "../utils/add.js";
 
 // Enquirer function to start the app
-export const enquirerFunction = async () => {
+export const enquirerFunction = async (server) => {
   let verifier = true;
   while (verifier) {
     await inquirer.prompt(options).then(async (answer) => {

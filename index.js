@@ -7,9 +7,6 @@ const PORT = process.env.PORT || 3008;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Run functions upon start
-enquirerFunction();
-
 // Default response for any other request (Not Found)
 app.use((req, res) => {
   res.status(404).end();
@@ -17,4 +14,6 @@ app.use((req, res) => {
 
 var server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  // Run functions upon start
+  enquirerFunction(server);
 });
