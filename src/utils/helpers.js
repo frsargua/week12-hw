@@ -1,14 +1,6 @@
-import * as mysql from "mysql2";
+import { db } from "../config/index.js";
 import * as cTable from "console.table";
 import { convertValue } from "../questions/options.js";
-
-const db = mysql.createConnection({
-  host: "localhost",
-  // MySQL username,
-  user: "root",
-  password: "",
-  database: "week12",
-});
 
 //Query statements
 //Load table from DB

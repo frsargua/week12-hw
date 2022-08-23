@@ -1,6 +1,5 @@
 import express from "express";
 import inquirer from "inquirer";
-import * as mysql from "mysql2";
 
 // Importing questions
 import {
