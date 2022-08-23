@@ -10,7 +10,6 @@ import {
   createNewRoleQuestionnaire,
   createNewEmployeeQuestionnaire,
   createUpdateEmployeeQuestionnaire,
-  convertValue,
 } from "./questions/options.js";
 
 //Importing functions for enquirer
