@@ -65,9 +65,6 @@ const enquirerFunction = async () => {
             .prompt(newEmployeeQuestionnaire)
             .then(async (answer) => {
               const newEmployee = Object.values(answer);
-              // if (newEmployee[3] == "none") {
-              //   newEmployee[3] = newEmployee[1];
-              // }
               console.log(newEmployee);
               addToEmployeeDB(
                 newEmployee[0],
