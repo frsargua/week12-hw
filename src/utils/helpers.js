@@ -19,7 +19,7 @@ export const printTableFromDB = async (table) => {
       "SELECT week12.role.id, week12.role.title, week12.role.salary, week12.deparment.name FROM week12.role JOIN week12.deparment ON week12.role.deparment_id = week12.deparment.id;";
   } else if (table == "employee") {
     sqlLit =
-      "SELECT week12.employee.first_name, week12.employee.last_name, role.title, role.salary,week12.deparment.name, CONCAT(week12.B.first_name,' ', week12.B.last_name) AS manager FROM week12.employee JOIN role ON week12.employee.role_id=week12.role.id LEFT JOIN week12.deparment ON week12.role.deparment_id = week12.deparment.id JOIN week12.employee B ON week12.employee.manager_id = week12.B.id ;";
+      "SELECT week12.employee.first_name, week12.employee.last_name, role.title, role.salary,week12.deparment.name, COALESCE(CONCAT(week12.B.first_name,' ', week12.B.last_name),'Manager') AS manager FROM week12.employee JOIN role ON week12.employee.role_id=week12.role.id LEFT JOIN week12.deparment ON week12.role.deparment_id = week12.deparment.id LEFT JOIN week12.employee B ON week12.employee.manager_id = week12.B.id ;";
   }
   const [rows] = await db.promise().query(sqlLit);
   console.log(cTable.getTable(rows));
